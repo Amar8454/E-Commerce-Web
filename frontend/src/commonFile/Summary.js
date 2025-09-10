@@ -1,4 +1,4 @@
-const backendDomain = "https://e-commerce-web-1-i6k6.onrender.com/";
+const backendDomain = "https://e-commerce-web-lueb.onrender.com/";
 
 exports.SummaryAPI = {
   signup: {
