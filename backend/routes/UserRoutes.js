@@ -38,7 +38,7 @@ router.post("/category_wise_product", getCategoryWiseProduct);
 router.post("/get_Product_detiales", getProductDetailes);
 
 //user add in cart
-router.post("/add_product_in_cart", UserAuthen, AddProductInCart);
+router.post("/add_product_in_cart", AddProductInCart);
 router.get("/count_addCart_product", getCountTotalAddCart);
 router.get("/show_all_cart_product", showAllAddCartProduct);
 router.put(
@@ -46,7 +46,7 @@ router.put(
   UserAuthen,
   updateAddCartProductQuantity
 );
-router.post("/delete_cart_product", UserAuthen, DeleteCartBtnProduct);
+router.post("/delete_cart_product", DeleteCartBtnProduct);
 router.get("/search_product_section", SearchProductSection);
 router.post("/filter_category_product", filterCategoryProduct);
 //for Admin
