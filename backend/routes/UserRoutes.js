@@ -26,7 +26,7 @@ const router = express.Router();
 
 router.post("/signup", UserSignUp);
 router.post("/login", UserLogin);
-router.get("/user_details", UserAuthen, UserProfielDeatials);
+router.get("/user_details",  UserProfielDeatials);
 router.get("/user_logged", UserLoggOut);
 
 // for upload product
@@ -38,8 +38,8 @@ router.post("/category_wise_product", getCategoryWiseProduct);
 router.post("/get_Product_detiales", getProductDetailes);
 
 //user add in cart
-router.post("/add_product_in_cart", UserAuthen, AddProductInCart);
-router.get("/count_addCart_product", UserAuthen, getCountTotalAddCart);
+router.post("/add_product_in_cart",  AddProductInCart);
+router.get("/count_addCart_product",  getCountTotalAddCart);
 router.get("/show_all_cart_product", showAllAddCartProduct);
 router.put(
   "/updated_add_cart_quantity",
