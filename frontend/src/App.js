@@ -17,14 +17,13 @@ function App() {
     const response = await fetch(SummaryAPI.userDetail.url, {
       method: SummaryAPI.userDetail.method,
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
     });
     const dataAPI = await response.json();
     if (dataAPI.success) {
       dispatch(setUserDetials(dataAPI.data));
     }
+
+    console.log(dataAPI);
   };
 
   const FetchAddCArtProduct = async () => {
@@ -37,6 +36,8 @@ function App() {
     });
     const dataAPI = await countData.json();
     setCountADDCArt(dataAPI?.data);
+
+    console.log(dataAPI);
   };
 
   useEffect(() => {
