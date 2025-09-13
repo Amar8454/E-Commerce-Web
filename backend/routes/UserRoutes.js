@@ -50,7 +50,7 @@ router.post("/delete_cart_product", DeleteCartBtnProduct);
 router.get("/search_product_section", SearchProductSection);
 router.post("/filter_category_product", filterCategoryProduct);
 //for Admin
-router.get("/all_user_show", UserAuthen, AllUserShow);
-router.post("/update_user_role", UserAuthen, ChangeUserRoleAndUpdate);
+router.get("/all_user_show", AllUserShow);
+router.post("/update_user_role", ChangeUserRoleAndUpdate);
 
 module.exports = router;
