@@ -38,19 +38,19 @@ router.post("/category_wise_product", getCategoryWiseProduct);
 router.post("/get_Product_detiales", getProductDetailes);
 
 //user add in cart
-router.post("/add_product_in_cart", AddProductInCart);
-router.get("/count_addCart_product", getCountTotalAddCart);
+router.post("/add_product_in_cart", UserAuthen, AddProductInCart);
+router.get("/count_addCart_product", UserAuthen, getCountTotalAddCart);
 router.get("/show_all_cart_product", showAllAddCartProduct);
 router.put(
   "/updated_add_cart_quantity",
   UserAuthen,
   updateAddCartProductQuantity
 );
-router.post("/delete_cart_product", DeleteCartBtnProduct);
+router.post("/delete_cart_product", UserAuthen, DeleteCartBtnProduct);
 router.get("/search_product_section", SearchProductSection);
 router.post("/filter_category_product", filterCategoryProduct);
 //for Admin
-router.get("/all_user_show", AllUserShow);
-router.post("/update_user_role", ChangeUserRoleAndUpdate);
+router.get("/all_user_show", UserAuthen, AllUserShow);
+router.post("/update_user_role", UserAuthen, ChangeUserRoleAndUpdate);
 
 module.exports = router;

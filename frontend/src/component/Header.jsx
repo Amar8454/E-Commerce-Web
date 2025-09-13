@@ -95,7 +95,7 @@ const Header = () => {
 
               {DisplayMenu && (
                 <div className="bg-white top-16 absolute bottom-0 h-fit p-2 shadow-xl rounded">
-                  {user?.role === ROLE.GENERAL && (
+                  {user != 0 && (
                     <Link
                       to={"/admin/product"}
                       className="whitespace-nowrap hover:bg-slate-100 p-2 hidden md:block"
