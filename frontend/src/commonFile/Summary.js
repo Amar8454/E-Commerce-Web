@@ -1,6 +1,6 @@
-// const backendDomain = "https://e-commerce-web-lueb.onrender.com";
+const backendDomain = "https://e-commerce-web-lueb.onrender.com";
 
-const backendDomain = "http://localhost:8081";
+// const backendDomain = "http://localhost:8081";
 
 exports.SummaryAPI = {
   signup: {

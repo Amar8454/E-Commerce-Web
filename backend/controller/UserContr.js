@@ -115,9 +115,9 @@ exports.UserProfielDeatials = async (req, res) => {
 
     res.status(200).json({
       message: "User details",
+      data: user,
       success: true,
       error: false,
-      data: user,
     });
   } catch (error) {
     return res.status(500).json({

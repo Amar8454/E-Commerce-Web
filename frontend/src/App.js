@@ -17,6 +17,9 @@ function App() {
     const response = await fetch(SummaryAPI.userDetail.url, {
       method: SummaryAPI.userDetail.method,
       credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
     const dataAPI = await response.json();
     if (dataAPI.success) {
