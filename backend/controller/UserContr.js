@@ -77,13 +77,14 @@ exports.UserLogin = async (req, res) => {
       const tokenOptions = {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
       };
 
       res.cookie("token", token, tokenOptions).status(200).json({
         message: "User Login Successfully",
+        data: token,
         success: true,
         error: false,
-        data: token,
       });
     }
   } catch (error) {
