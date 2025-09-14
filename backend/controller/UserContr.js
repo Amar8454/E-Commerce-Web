@@ -427,10 +427,24 @@ exports.updateAddCartProductQuantity = async (req, res) => {
 
 exports.DeleteCartBtnProduct = async (req, res) => {
   try {
-    const deleteAddCart = req.body._id;
-    const deleteAddCartProduct = await AddProductModel.deleteOne({
-      _id: deleteAddCart,
-    });
+    const currentUser = req.userId;
+    const { _id } = req.body;
+
+    const product = await AddProductModel.findById({ _id });
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ message: "Product not found", success: false, error: true });
+    }
+
+    if (product.userId.toString() !== currentUser) {
+      return res
+        .status(403)
+        .json({ message: "Not Authorized ", success: false, error: true });
+    }
+
+    const deleteAddCartProduct = await AddProductModel.deleteOne({ _id });
 
     res.json({
       data: deleteAddCartProduct,

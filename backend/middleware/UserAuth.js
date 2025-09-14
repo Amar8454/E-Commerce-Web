@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 
 exports.UserAuthen = (req, res, next) => {
   try {
-    const token = req.cookies?.token;
+    const token = req?.cookies?.token;
+    
     if (!token) {
       return res.status(400).json({
         message: " Please Login",
@@ -18,7 +19,6 @@ exports.UserAuthen = (req, res, next) => {
       req.userId = decoded?._id;
       next();
     });
-    
   } catch (error) {
     return res.status(400).json({
       message: error.message || error,

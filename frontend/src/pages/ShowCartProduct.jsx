@@ -79,6 +79,7 @@ const ShowCartProduct = () => {
   const handleCartBtnDelete = async (id) => {
     const deleteCart = await fetch(SummaryAPI.deleteAddCartProduct.url, {
       method: SummaryAPI.deleteAddCartProduct.method,
+      credentials: "include",
       headers: {
         "content-type": "application/json",
       },
@@ -137,11 +138,10 @@ const ShowCartProduct = () => {
                       />
                     </div>
                     <div className="px-4 py-2 relative">
-                      <div
-                        className="absolute right-0 -top-1 text-red-600 rounded-full p-1 hover:bg-red-700 cursor-pointer hover:text-white"
-                        onClick={() => handleCartBtnDelete(product?._id)}
-                      >
-                        <MdDelete />
+                      <div className="absolute right-0 -top-1 text-red-600 rounded-full p-1 hover:bg-red-700 cursor-pointer hover:text-white">
+                        <MdDelete
+                          onClick={() => handleCartBtnDelete(product?._id)}
+                        />
                       </div>
                       <h1 className=" text-lg lg:text-xl text-ellipsis line-clamp-1">
                         {product.productId.product}
