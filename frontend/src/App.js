@@ -22,7 +22,6 @@ function App() {
     if (dataAPI.success) {
       dispatch(setUserDetials(dataAPI.data));
     }
-
   };
 
   const FetchAddCArtProduct = async () => {
@@ -35,7 +34,6 @@ function App() {
     });
     const dataAPI = await countData.json();
     setCountADDCArt(dataAPI?.data);
-
   };
 
   useEffect(() => {

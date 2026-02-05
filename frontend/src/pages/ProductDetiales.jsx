@@ -129,7 +129,6 @@ const ProductDetiales = () => {
             <div>
               <p className="font-medium my-1 h-6 bg-slate-200 rounded-full animate-pulse "></p>
               <p className="bg-slate-200 rounded-full h-6 animate-pulse font-medium mt-4">
-                {" "}
               </p>
             </div>
           </div>
