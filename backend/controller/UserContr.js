@@ -71,7 +71,7 @@ exports.UserLogin = async (req, res) => {
       const token = jwt.sign(
         { _id: user._id, email: user.email },
         process.env.SECRET_KEY,
-        { expiresIn: "2hr" }
+        { expiresIn: "2hr" },
       );
 
       const tokenOptions = {
@@ -323,39 +323,47 @@ exports.getProductDetailes = async (req, res) => {
   }
 };
 
+
 exports.AddProductInCart = async (req, res) => {
   try {
-    const { productId } = req?.body;
-    const currentUser = req.userId;
+    const { productId } = req.body;
+    const userId = req.userId;
 
-    const AddProduct = await AddProductModel.findOne({ productId });
-    if (AddProduct) {
-      return res.status(404).json({
-        message: "Already exits is Add to cart",
-        success: false,
-        error: true,
+    // ✅ check product for same user
+    const alreadyExist = await AddProductModel.findOne({
+      productId,
+      userId,
+    });
+
+    if (alreadyExist) {
+      return res.status(200).json({
+        message: "Product already in cart",
+        success: true,
+        error: false,
       });
     }
 
     const payload = {
-      productId: productId,
+      productId,
       quantity: 1,
-      userId: currentUser,
+      userId,
     };
 
-    const AddNewData = new AddProductModel(payload);
-    await AddNewData.save();
+    const addNewProduct = new AddProductModel(payload);
+    await addNewProduct.save();
 
-    res.status(200).json({
-      message: "Product Added",
-      data: AddNewData,
+    return res.status(200).json({
+      message: "Product added to cart",
+      data: addNewProduct,
       success: true,
       error: false,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || error, error: true, success: false });
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 };
 
@@ -364,100 +372,126 @@ exports.getCountTotalAddCart = async (req, res) => {
     const userId = req.userId;
 
     const countAddCart = await AddProductModel.countDocuments({
-      userId: userId,
+      userId,
     });
 
-    res.json({
-      data: countAddCart,
-      message: "Ok",
+    return res.json({
+      data: countAddCart || 0,
+      message: "Cart count",
       success: true,
       error: false,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || error, error: true, success: false });
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 };
 
+
 exports.showAllAddCartProduct = async (req, res) => {
   try {
-    const currentUser = req?.userId;
-    const allProduct = await AddProductModel.find({ currentUser }).populate(
-      "productId"
-    );
+    const userId = req.userId;
 
-    res.json({
-      data: allProduct,
+    const allProduct = await AddProductModel.find({
+      userId,
+    }).populate("productId");
+
+    return res.json({
+      data: allProduct || [], // ✅ ALWAYS ARRAY
       message: "Show Cart",
       success: true,
       error: false,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || error, error: true, success: false });
+    return res.status(500).json({
+      data: [],
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 };
+
 
 exports.updateAddCartProductQuantity = async (req, res) => {
   try {
     const userId = req.userId;
-    const updateById = req.body._id;
-    const qty = req.body.quantity;
+    const { _id, quantity } = req.body;
 
-    const updateAddCart = await AddProductModel.findOneAndUpdate(
-      { _id: updateById, userId },
-      { $inc: { quantity: qty } },
-      { new: true }
-    );
+    const cartItem = await AddProductModel.findOne({
+      _id,
+      userId,
+    });
 
-    res.json({
-      data: updateAddCart,
-      message: "Quantity Updated",
+    if (!cartItem) {
+      return res.status(404).json({
+        message: "Cart item not found",
+        success: false,
+        error: true,
+      });
+    }
+
+    cartItem.quantity += quantity;
+
+    // ✅ quantity never below 1
+    if (cartItem.quantity < 1) {
+      cartItem.quantity = 1;
+    }
+
+    await cartItem.save();
+
+    return res.json({
+      data: cartItem,
+      message: "Quantity updated",
       success: true,
       error: false,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || error, error: true, success: false });
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 };
 
 exports.DeleteCartBtnProduct = async (req, res) => {
   try {
-    const currentUser = req.userId;
+    const userId = req.userId;
     const { _id } = req.body;
 
-    const product = await AddProductModel.findById({ _id });
+    const product = await AddProductModel.findOne({
+      _id,
+      userId,
+    });
 
     if (!product) {
-      return res
-        .status(404)
-        .json({ message: "Product not found", success: false, error: true });
+      return res.status(404).json({
+        message: "Product not found",
+        success: false,
+        error: true,
+      });
     }
 
-    if (product.userId.toString() !== currentUser) {
-      return res
-        .status(403)
-        .json({ message: "Not Authorized ", success: false, error: true });
-    }
+    await AddProductModel.deleteOne({ _id });
 
-    const deleteAddCartProduct = await AddProductModel.deleteOne({ _id });
-
-    res.json({
-      data: deleteAddCartProduct,
+    return res.json({
       message: "Product deleted",
-      error: false,
       success: true,
+      error: false,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: error.message || error, error: true, success: false });
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 };
+
 
 exports.SearchProductSection = async (req, res) => {
   try {
