@@ -113,7 +113,6 @@ const ShowCartProduct = () => {
   }, []);
 
   const safeData = Array.isArray(data) ? data : [];
-
   const totalQty = safeData.reduce(
     (sum, item) => sum + (item?.quantity || 0),
     0,

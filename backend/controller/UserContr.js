@@ -323,12 +323,20 @@ exports.getProductDetailes = async (req, res) => {
   }
 };
 
+// ================= ADD PRODUCT TO CART =================
 exports.AddProductInCart = async (req, res) => {
   try {
     const { productId } = req.body;
     const userId = req.userId;
 
-    // ✅ check product for same user
+    if (!productId) {
+      return res.status(400).json({
+        message: "ProductId is required",
+        success: false,
+        error: true,
+      });
+    }
+
     const alreadyExist = await AddProductModel.findOne({
       productId,
       userId,
@@ -342,86 +350,88 @@ exports.AddProductInCart = async (req, res) => {
       });
     }
 
-    const payload = {
+    const cartProduct = await AddProductModel.create({
       productId,
       quantity: 1,
       userId,
-    };
+    });
 
-    const addNewProduct = new AddProductModel(payload);
-    await addNewProduct.save();
-
-    return res.status(200).json({
+    return res.status(201).json({
       message: "Product added to cart",
-      data: addNewProduct,
+      data: cartProduct,
       success: true,
       error: false,
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message || error,
-      error: true,
+      message: error.message,
       success: false,
+      error: true,
     });
   }
 };
 
+// ================= COUNT CART PRODUCTS =================
 exports.getCountTotalAddCart = async (req, res) => {
   try {
     const userId = req.userId;
 
-    const countAddCart = await AddProductModel.countDocuments({
-      userId,
-    });
+    const count = await AddProductModel.countDocuments({ userId });
 
     return res.json({
-      data: countAddCart || 0,
-      message: "Cart count",
+      data: count,
+      message: "Cart count fetched",
       success: true,
       error: false,
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message || error,
-      error: true,
+      message: error.message,
       success: false,
+      error: true,
     });
   }
 };
 
+// ================= SHOW ALL CART PRODUCTS =================
 exports.showAllAddCartProduct = async (req, res) => {
   try {
-    const currentUser = req.userId;
+    const userId = req.userId;
 
-    const allProduct = await AddProductModel.find({
-      userId: currentUser,
-    }).populate("productId");
+    const cartProducts = await AddProductModel.find({ userId })
+      .populate("productId")
+      .sort({ createdAt: -1 });
 
     return res.json({
-      data: allProduct || [],
-      message: "Show Cart",
+      data: cartProducts,
+      message: "Cart products fetched",
       success: true,
       error: false,
     });
   } catch (error) {
     return res.status(500).json({
-      data: [],
-      message: error.message || error,
-      error: true,
+      message: error.message,
       success: false,
+      error: true,
     });
   }
 };
 
+// ================= UPDATE CART QUANTITY =================
 exports.updateAddCartProductQuantity = async (req, res) => {
   try {
     const userId = req.userId;
     const { _id, quantity } = req.body;
 
-    const cartItem = await AddProductModel.findOne({
-      _id,
-      userId,
-    });
+    if (!_id || quantity === undefined) {
+      return res.status(400).json({
+        message: "CartId and quantity required",
+        success: false,
+        error: true,
+      });
+    }
+
+    const cartItem = await AddProductModel.findOne({ _id, userId });
 
     if (!cartItem) {
       return res.status(404).json({
@@ -431,13 +441,7 @@ exports.updateAddCartProductQuantity = async (req, res) => {
       });
     }
 
-    cartItem.quantity += quantity;
-
-    // ✅ quantity never below 1
-    if (cartItem.quantity < 1) {
-      cartItem.quantity = 1;
-    }
-
+    cartItem.quantity = Math.max(1, cartItem.quantity + quantity);
     await cartItem.save();
 
     return res.json({
@@ -448,46 +452,54 @@ exports.updateAddCartProductQuantity = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message || error,
-      error: true,
+      message: error.message,
       success: false,
+      error: true,
     });
   }
 };
 
+// ================= DELETE CART PRODUCT =================
 exports.DeleteCartBtnProduct = async (req, res) => {
   try {
     const userId = req.userId;
     const { _id } = req.body;
 
-    const product = await AddProductModel.findOne({
-      _id,
-      userId,
-    });
-
-    if (!product) {
-      return res.status(404).json({
-        message: "Product not found",
+    if (!_id) {
+      return res.status(400).json({
+        message: "CartId required",
         success: false,
         error: true,
       });
     }
 
-    await AddProductModel.deleteOne({ _id });
+    const deleted = await AddProductModel.findOneAndDelete({
+      _id,
+      userId,
+    });
+
+    if (!deleted) {
+      return res.status(404).json({
+        message: "Product not found in cart",
+        success: false,
+        error: true,
+      });
+    }
 
     return res.json({
-      message: "Product deleted",
+      message: "Product removed from cart",
       success: true,
       error: false,
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message || error,
-      error: true,
+      message: error.message,
       success: false,
+      error: true,
     });
   }
 };
+
 
 exports.SearchProductSection = async (req, res) => {
   try {
