@@ -42,7 +42,7 @@ function App() {
 
     // user detials cart Product
     FetchAddCArtProduct();
-  }, [fetchUserDetials, FetchAddCArtProduct]);
+  }, []);
 
   return (
     <>

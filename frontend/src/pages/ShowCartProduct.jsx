@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { SummaryAPI } from "../commonFile/Summary";
 import Context from "../context";
 import displayCurrency from "../helperFile/DisplayCurrency";
@@ -7,11 +7,13 @@ import { MdDelete } from "react-icons/md";
 const ShowCartProduct = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const context = useContext(Context);
 
   const loadingList = new Array(context?.countADDCArt || 3).fill(null);
 
-  const fetchAllAddCartProduct = async () => {
+  // ================= FETCH CART =================
+  const fetchAllAddCartProduct = useCallback(async () => {
     setLoading(true);
     try {
       const fetchData = await fetch(SummaryAPI.showAllCartProducts.url, {
@@ -23,73 +25,65 @@ const ShowCartProduct = () => {
       });
 
       const dataAPI = await fetchData.json();
-
-      if (Array.isArray(dataAPI?.data)) {
-        setData(dataAPI.data);
-      } else {
-        setData([]);
-      }
+      setData(Array.isArray(dataAPI?.data) ? dataAPI.data : []);
     } catch (error) {
       console.error("Cart fetch error:", error);
-      setData([]); //
+      setData([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
+  // ================= INCREMENT =================
   const increamentQuantity = async (id) => {
     try {
-      const productQty = await fetch(
-        SummaryAPI.updateAddCartProductQuanity.url,
-        {
-          method: SummaryAPI.updateAddCartProductQuanity.method,
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            _id: id,
-            quantity: 1,
-          }),
+      const res = await fetch(SummaryAPI.updateAddCartProductQuanity.url, {
+        method: SummaryAPI.updateAddCartProductQuanity.method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          _id: id,
+          quantity: 1,
+        }),
+      });
 
-      const dataAPI = await productQty.json();
+      const dataAPI = await res.json();
       if (dataAPI.success) fetchAllAddCartProduct();
     } catch (err) {
       console.error(err);
     }
   };
 
+  // ================= DECREMENT =================
   const decreamentQuantity = async (id, qty) => {
     if (qty < 2) return;
 
     try {
-      const productQty = await fetch(
-        SummaryAPI.updateAddCartProductQuanity.url,
-        {
-          method: SummaryAPI.updateAddCartProductQuanity.method,
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            _id: id,
-            quantity: -1,
-          }),
+      const res = await fetch(SummaryAPI.updateAddCartProductQuanity.url, {
+        method: SummaryAPI.updateAddCartProductQuanity.method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          _id: id,
+          quantity: -1,
+        }),
+      });
 
-      const dataAPI = await productQty.json();
+      const dataAPI = await res.json();
       if (dataAPI.success) fetchAllAddCartProduct();
     } catch (err) {
       console.error(err);
     }
   };
 
+  // ================= DELETE =================
   const handleCartBtnDelete = async (id) => {
     try {
-      const deleteCart = await fetch(SummaryAPI.deleteAddCartProduct.url, {
+      const res = await fetch(SummaryAPI.deleteAddCartProduct.url, {
         method: SummaryAPI.deleteAddCartProduct.method,
         credentials: "include",
         headers: {
@@ -98,7 +92,7 @@ const ShowCartProduct = () => {
         body: JSON.stringify({ _id: id }),
       });
 
-      const resDataAPI = await deleteCart.json();
+      const resDataAPI = await res.json();
       if (resDataAPI.success) {
         fetchAllAddCartProduct();
         context?.FetchAddCArtProduct?.();
@@ -108,11 +102,14 @@ const ShowCartProduct = () => {
     }
   };
 
+  // ================= INITIAL LOAD =================
   useEffect(() => {
     fetchAllAddCartProduct();
-  }, []);
+  }, [fetchAllAddCartProduct]);
 
+  // ================= SAFE CALCULATIONS =================
   const safeData = Array.isArray(data) ? data : [];
+
   const totalQty = safeData.reduce(
     (sum, item) => sum + (item?.quantity || 0),
     0,
@@ -124,25 +121,24 @@ const ShowCartProduct = () => {
     0,
   );
 
+  // ================= UI =================
   return (
     <div className="container mx-auto p-4">
       <div className="text-center text-lg my-3">
-        {!loading && data.length === 0 && <p>No Data</p>}
+        {!loading && safeData.length === 0 && <p>No Data</p>}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-10 lg:justify-center p-4">
         {/* CART LIST */}
         <div className="w-full max-w-3xl">
-          {loading ? (
-            loadingList.map((_, idx) => (
-              <div
-                key={idx}
-                className="w-full bg-slate-200 h-32 my-2 rounded animate-pulse"
-              />
-            ))
-          ) : (
-            <>
-              {data.map((product) => (
+          {loading
+            ? loadingList.map((_, idx) => (
+                <div
+                  key={idx}
+                  className="w-full bg-slate-200 h-32 my-2 rounded animate-pulse"
+                />
+              ))
+            : safeData.map((product) => (
                 <div
                   key={product?._id}
                   className="w-full bg-white my-2 rounded grid grid-cols-[128px,1fr] p-2"
@@ -174,7 +170,8 @@ const ShowCartProduct = () => {
                       </p>
                       <p>
                         {displayCurrency(
-                          product?.productId?.sellingPrice * product?.quantity,
+                          (product?.productId?.sellingPrice || 0) *
+                            (product?.quantity || 0),
                         )}
                       </p>
                     </div>
@@ -199,8 +196,6 @@ const ShowCartProduct = () => {
                   </div>
                 </div>
               ))}
-            </>
-          )}
         </div>
 
         {/* SUMMARY */}
