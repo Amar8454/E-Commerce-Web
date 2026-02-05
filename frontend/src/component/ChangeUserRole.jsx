@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ROLE from "../commonFile/Role";
 import { toast } from "react-toastify";
 import { SummaryAPI } from "../commonFile/Summary";
