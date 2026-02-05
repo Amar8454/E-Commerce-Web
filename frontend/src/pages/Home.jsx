@@ -1,5 +1,4 @@
 import React from "react";
-import { SummaryAPI } from "../commonFile/Summary";
 import GetProductByCategory from "../component/GetProductByCategory";
 import BannerPageLayout from "../component/BannerPageLayout";
 import HorizontalCardProduct from "../component/HorizontalCardProduct";

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import AllProductCatogory from "../helperFile/ProductCategory";
 import { SummaryAPI } from "../commonFile/Summary";
 import VerticalCart from "../component/VerticalCart";

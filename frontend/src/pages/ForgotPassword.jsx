@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import userIcons from "../assest/signin.gif";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
 
 const ForgotPassword = () => {
