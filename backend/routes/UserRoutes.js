@@ -40,7 +40,7 @@ router.post("/get_Product_detiales", getProductDetailes);
 //user add in cart
 router.post("/add_product_in_cart", UserAuthen, AddProductInCart);
 router.get("/count_addCart_product", UserAuthen, getCountTotalAddCart);
-router.get("/show_all_cart_product", UserAuthen, showAllAddCartProduct);
+router.get("/show_all_cart_product", showAllAddCartProduct);
 router.put(
   "/updated_add_cart_quantity",
   UserAuthen,
