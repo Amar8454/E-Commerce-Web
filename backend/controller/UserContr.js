@@ -398,7 +398,7 @@ exports.showAllAddCartProduct = async (req, res) => {
     }).populate("productId");
 
     return res.json({
-      data: allProduct || [], // ✅ ALWAYS ARRAY
+      data: allProduct || [],
       message: "Show Cart",
       success: true,
       error: false,
