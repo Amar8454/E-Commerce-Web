@@ -24,11 +24,14 @@ const ShowCartProduct = () => {
 
       const dataAPI = await fetchData.json();
 
-      // ✅ ALWAYS set array
-      setData(Array.isArray(dataAPI?.data) ? dataAPI.data : []);
+      if (Array.isArray(dataAPI?.data)) {
+        setData(dataAPI.data);
+      } else {
+        setData([]);
+      }
     } catch (error) {
       console.error("Cart fetch error:", error);
-      setData([]);
+      setData([]); //
     } finally {
       setLoading(false);
     }
@@ -109,13 +112,14 @@ const ShowCartProduct = () => {
     fetchAllAddCartProduct();
   }, []);
 
-  // ✅ SAFE reduce
-  const totalQty = (data || []).reduce(
+  const safeData = Array.isArray(data) ? data : [];
+
+  const totalQty = safeData.reduce(
     (sum, item) => sum + (item?.quantity || 0),
     0,
   );
 
-  const totalPrice = (data || []).reduce(
+  const totalPrice = safeData.reduce(
     (sum, item) =>
       sum + (item?.quantity || 0) * (item?.productId?.sellingPrice || 0),
     0,
