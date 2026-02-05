@@ -323,7 +323,6 @@ exports.getProductDetailes = async (req, res) => {
   }
 };
 
-
 exports.AddProductInCart = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -390,13 +389,12 @@ exports.getCountTotalAddCart = async (req, res) => {
   }
 };
 
-
 exports.showAllAddCartProduct = async (req, res) => {
   try {
-    const userId = req.userId;
+    const currentUser = req.userId;
 
     const allProduct = await AddProductModel.find({
-      userId,
+      userId: currentUser,
     }).populate("productId");
 
     return res.json({
@@ -414,7 +412,6 @@ exports.showAllAddCartProduct = async (req, res) => {
     });
   }
 };
-
 
 exports.updateAddCartProductQuantity = async (req, res) => {
   try {
@@ -491,7 +488,6 @@ exports.DeleteCartBtnProduct = async (req, res) => {
     });
   }
 };
-
 
 exports.SearchProductSection = async (req, res) => {
   try {
